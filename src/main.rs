@@ -4,11 +4,13 @@
 
 mod camera;
 mod environment;
+mod player;
 
 use crate::camera::CameraPlugin;
 use crate::environment::level::LevelPlugin;
 use bevy::prelude::*;
 use bevy_editor_pls::prelude::*;
+use player::PlayerPlugin;
 
 fn main() {
     App::new()
@@ -16,5 +18,6 @@ fn main() {
         .add_plugin(EditorPlugin)
         .add_plugin(CameraPlugin)
         .add_plugin(LevelPlugin)
+        .add_plugin(PlayerPlugin)
         .run();
 }

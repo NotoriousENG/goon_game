@@ -181,13 +181,16 @@ fn load_skybox(
             }
         }
         if !updated {
-            commands.spawn(MaterialMeshBundle::<CubemapMaterial> {
-                mesh: meshes.add(Mesh::from(shape::Cube { size: 10000.0 })),
-                material: cubemap_materials.add(CubemapMaterial {
-                    base_color_texture: Some(cubemap.image_handle.clone_weak()),
-                }),
-                ..default()
-            });
+            commands.spawn((
+                MaterialMeshBundle::<CubemapMaterial> {
+                    mesh: meshes.add(Mesh::from(shape::Cube { size: 10000.0 })),
+                    material: cubemap_materials.add(CubemapMaterial {
+                        base_color_texture: Some(cubemap.image_handle.clone_weak()),
+                    }),
+                    ..default()
+                },
+                Name::new("Skybox"),
+            ));
         }
 
         cubemap.is_loaded = true;
