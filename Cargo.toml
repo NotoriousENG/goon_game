@@ -21,6 +21,7 @@ dev = [
 
 [dependencies]
 bevy = { version = "0.10", default-features = true}
+bevy_editor_pls = "0.3"
 
 [build-dependencies]
 embed-resource = "1.4"
