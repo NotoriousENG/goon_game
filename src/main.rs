@@ -3,10 +3,10 @@
 //!
 
 mod camera;
-mod level;
+mod environment;
 
 use crate::camera::CameraPlugin;
-use crate::level::LevelPlugin;
+use crate::environment::level::LevelPlugin;
 use bevy::prelude::*;
 use bevy_editor_pls::prelude::*;
 

@@ -1,6 +1,4 @@
-mod skybox;
-
-use crate::level::skybox::SkyboxPlugin; // probably a better way to do this, in level for right now since nothing else needs to know about it yet
+use crate::environment::skybox::SkyboxPlugin; // probably a better way to do this, in level for right now since nothing else needs to know about it yet
 use bevy::prelude::*;
 
 pub struct LevelPlugin;
