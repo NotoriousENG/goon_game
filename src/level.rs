@@ -12,5 +12,5 @@ fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
     commands.spawn(SceneBundle {
         scene: asset_server.load("models/level.gltf#Scene0"),
         ..default()
-    });
+    }).insert(Name::new("Level"));
 }
