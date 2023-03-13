@@ -199,6 +199,7 @@ fn load_skybox(
     }
 }
 
+#[allow(dead_code)]
 pub fn set_skybox_texture(mut cubemap: ResMut<Cubemap>, image_handle: Handle<Image>) {
     cubemap.image_handle = image_handle;
     cubemap.is_loaded = false;
