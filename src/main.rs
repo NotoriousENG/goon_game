@@ -3,6 +3,7 @@
 //!
 
 mod camera;
+mod clamp;
 mod environment;
 mod player;
 
