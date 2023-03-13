@@ -1,3 +1,5 @@
+use std::time::Duration;
+
 use bevy::prelude::*;
 
 use crate::clamp::Clamp;
@@ -7,7 +9,8 @@ pub struct PlayerPlugin;
 impl Plugin for PlayerPlugin {
     fn build(&self, app: &mut App) {
         app.add_startup_system(setup)
-            .add_system(setup_player_once_loaded.after(setup))
+            .add_system((setup_player_once_loaded).after(setup))
+            .add_system(keyboard_animation_control)
             .add_system(move_player);
     }
 }
@@ -66,8 +69,10 @@ fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
 
     commands.insert_resource(PlayerAnimations(vec![
         // for whatever reason, the animations are in reverse order so list them backwards here
-        asset_server.load("models/player/goblin_animated.gltf#Animation1"), // 1. Idle
-        asset_server.load("models/player/goblin_animated.gltf#Animation0"), // 0. Run
+        asset_server.load("models/player/goblin_animated.gltf#Animation0"), // 0. Idle
+        asset_server.load("models/player/goblin_animated.gltf#Animation1"), // 1. Jump
+        asset_server.load("models/player/goblin_animated.gltf#Animation2"), // 2. Run
+        asset_server.load("models/player/goblin_animated.gltf#Animation3"), // 3. Slide
     ]));
 }
 
@@ -99,5 +104,24 @@ fn move_player(
 
         // set x position based on lane
         player_transform.translation.x = lane_entity.lane as i32 as f32 * 4.0;
+    }
+}
+
+fn keyboard_animation_control(
+    keyboard_input: Res<Input<KeyCode>>,
+    mut animation_player: Query<&mut AnimationPlayer>,
+    animations: Res<PlayerAnimations>,
+    mut current_animation: Local<usize>,
+) {
+    if let Ok(mut player) = animation_player.get_single_mut() {
+        if keyboard_input.just_pressed(KeyCode::Return) {
+            *current_animation = (*current_animation + 1) % animations.0.len();
+            player
+                .play_with_transition(
+                    animations.0[*current_animation].clone_weak(),
+                    Duration::from_millis(250),
+                )
+                .repeat();
+        }
     }
 }
