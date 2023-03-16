@@ -10,26 +10,12 @@ impl Plugin for LevelPlugin {
 }
 
 fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
-    commands
-        .spawn((
-            SceneBundle {
-                scene: asset_server.load("models/level/level.gltf#Scene0"),
-                ..default()
-            },
-            Name::new("Level"),
-        ))
-        .with_children(|level| {
-            level.spawn((
-                DirectionalLightBundle {
-                    transform: Transform::from_xyz(0.0, 0.0, 0.0).with_rotation(Quat::from_euler(
-                        EulerRot::XYZ,
-                        62.0,
-                        0.0,
-                        0.0,
-                    )),
-                    ..default()
-                },
-                Name::new("Sun"),
-            ));
-        });
+    commands.spawn((
+        SceneBundle {
+            scene: asset_server.load("models/level/level.gltf#Scene0"),
+            transform: Transform::from_rotation(Quat::from_rotation_y(std::f32::consts::PI)),
+            ..default()
+        },
+        Name::new("Level"),
+    ));
 }
