@@ -59,7 +59,6 @@ impl Default for LaneEntity {
 
 #[derive(Resource)]
 struct PlayerAnimations(Vec<Handle<AnimationClip>>);
-
 const CAMERA_HEIGHT: f32 = 10.0;
 const CAM_Z_DISTANCE: f32 = 10.0;
 
@@ -145,18 +144,39 @@ fn move_player(
 fn keyboard_animation_control(
     keyboard_input: Res<Input<KeyCode>>,
     mut animation_player: Query<&mut AnimationPlayer>,
-    animations: Res<PlayerAnimations>,
+    animation_handles: Res<PlayerAnimations>,
+    animation_assets: ResMut<Assets<AnimationClip>>,
     mut current_animation: Local<usize>,
 ) {
     if let Ok(mut player) = animation_player.get_single_mut() {
-        if keyboard_input.just_pressed(KeyCode::Return) {
-            *current_animation = (*current_animation + 1) % animations.0.len();
-            player
-                .play_with_transition(
-                    animations.0[*current_animation].clone_weak(),
-                    Duration::from_millis(250),
-                )
-                .repeat();
+        if keyboard_input.just_pressed(KeyCode::W) {
+            // jump once then return to run animation
+            *current_animation = 1;
+            player.play_with_transition(
+                animation_handles.0[*current_animation].clone_weak(),
+                Duration::from_millis(250),
+            );
+        }
+        if keyboard_input.just_pressed(KeyCode::S) {
+            // slide once then return to run animation
+            *current_animation = 3;
+            player.play_with_transition(
+                animation_handles.0[*current_animation].clone_weak(),
+                Duration::from_millis(250),
+            );
+        }
+
+        if let Some(clip) = animation_assets.get(&animation_handles.0[*current_animation]) {
+            // return to run animation if not already playing
+            if player.elapsed() >= clip.duration() - 0.250 {
+                *current_animation = 2;
+                player
+                    .play_with_transition(
+                        animation_handles.0[2].clone_weak(),
+                        Duration::from_millis(250),
+                    )
+                    .repeat();
+            }
         }
     }
 }
