@@ -20,7 +20,9 @@ dev = [
 ]
 
 [dependencies]
+rand = "0.8.5"
 bevy = { version = "0.10", default-features = true}
+bevy_rapier3d = { version = "0.21", features = [ "simd-stable", "debug-render-3d" ] }
 bevy_editor_pls = "0.3"
 
 [build-dependencies]

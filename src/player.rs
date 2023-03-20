@@ -1,8 +1,11 @@
 use std::time::Duration;
 
+use crate::{
+    constants::{LANE_FACTOR, TRACK_LENGTH},
+    lanes::LaneEntity,
+};
 use bevy::prelude::*;
-
-use crate::clamp::Clamp;
+use bevy_rapier3d::prelude::*;
 
 pub struct PlayerPlugin;
 
@@ -12,7 +15,8 @@ impl Plugin for PlayerPlugin {
             .add_system((setup_player_once_loaded).after(setup))
             .add_system(keyboard_animation_control)
             .add_system(move_player)
-            .add_system(move_player_root);
+            .add_system(move_player_root)
+            .add_system(handle_collision_events);
     }
 }
 
@@ -20,42 +24,10 @@ impl Plugin for PlayerPlugin {
 pub struct Player;
 
 #[derive(Component)]
-pub struct PlayerRoot;
-
-#[derive(Clone, Copy)]
-pub enum Lane {
-    Left = -1,
-    Middle = 0,
-    Right = 1,
-}
+pub struct PlayerCollider;
 
 #[derive(Component)]
-pub struct LaneEntity {
-    pub lane: Lane,
-}
-
-impl LaneEntity {
-    pub fn change_lane(&mut self, direction: i32) {
-        // set the lane to the clamp of the current lane + the input
-        let next_lane = Clamp::clamp(
-            self.lane as i32 + direction,
-            Lane::Left as i32,
-            Lane::Right as i32,
-        );
-        self.lane = match next_lane {
-            0 => Lane::Middle,
-            1 => Lane::Right,
-            -1 => Lane::Left,
-            _ => panic!("Invalid lane value"),
-        };
-    }
-}
-
-impl Default for LaneEntity {
-    fn default() -> Self {
-        Self { lane: Lane::Middle }
-    }
-}
+pub struct PlayerRoot;
 
 #[derive(Resource)]
 struct PlayerAnimations(Vec<Handle<AnimationClip>>);
@@ -84,7 +56,19 @@ fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
                 Name::new("player"),
                 Player,
                 LaneEntity::default(),
-            ));
+            ))
+            .with_children(|player| {
+                player.spawn((
+                    TransformBundle::from(Transform::from_translation(Vec3::new(0.0, 4.3, 0.0))),
+                    Collider::cuboid(1.0, 3.52, 1.0),
+                    Sensor,
+                    Name::new("player collider"),
+                    PlayerCollider,
+                    RigidBody::Dynamic,
+                    GravityScale(0.0), // we just do this in the animation system
+                    ActiveEvents::COLLISION_EVENTS,
+                ));
+            });
             root.spawn(Camera3dBundle {
                 transform: Transform::from_xyz(0.0, CAMERA_HEIGHT, CAM_Z_DISTANCE)
                     .looking_at(Vec3::Y * CAMERA_HEIGHT / 1.5, Vec3::Y),
@@ -118,7 +102,7 @@ fn setup_player_once_loaded(
 fn move_player_root(mut player_root: Query<&mut Transform, With<PlayerRoot>>, time: Res<Time>) {
     for mut player_root_transform in player_root.iter_mut() {
         player_root_transform.translation.z -= time.delta_seconds() * 20.0;
-        if player_root_transform.translation.z < -240.0 {
+        if player_root_transform.translation.z < -TRACK_LENGTH {
             player_root_transform.translation.z = 0.0;
         }
     }
@@ -137,7 +121,7 @@ fn move_player(
         lane_entity.change_lane(x as i32);
 
         // set x position based on lane
-        player_transform.translation.x = lane_entity.lane as i32 as f32 * 4.0;
+        player_transform.translation.x = lane_entity.lane as i32 as f32 * LANE_FACTOR;
     }
 }
 
@@ -147,6 +131,7 @@ fn keyboard_animation_control(
     animation_handles: Res<PlayerAnimations>,
     animation_assets: ResMut<Assets<AnimationClip>>,
     mut current_animation: Local<usize>,
+    mut player_collision: Query<&mut Transform, With<PlayerCollider>>,
 ) {
     if let Ok(mut player) = animation_player.get_single_mut() {
         if keyboard_input.just_pressed(KeyCode::W) {
@@ -156,6 +141,10 @@ fn keyboard_animation_control(
                 animation_handles.0[*current_animation].clone_weak(),
                 Duration::from_millis(250),
             );
+            player_collision.iter_mut().for_each(|mut transform| {
+                transform.scale.y = 0.5;
+                transform.translation.y = 6.3;
+            });
         }
         if keyboard_input.just_pressed(KeyCode::S) {
             // slide once then return to run animation
@@ -164,6 +153,10 @@ fn keyboard_animation_control(
                 animation_handles.0[*current_animation].clone_weak(),
                 Duration::from_millis(250),
             );
+            player_collision.iter_mut().for_each(|mut transform| {
+                transform.translation.y = 2.15;
+                transform.scale.y = 0.5;
+            });
         }
 
         if let Some(clip) = animation_assets.get(&animation_handles.0[*current_animation]) {
@@ -176,6 +169,28 @@ fn keyboard_animation_control(
                         Duration::from_millis(250),
                     )
                     .repeat();
+                player_collision.iter_mut().for_each(|mut transform| {
+                    transform.translation.y = 4.3;
+                    transform.scale.y = 1.0;
+                });
+            }
+        }
+    }
+}
+
+fn handle_collision_events(
+    query_player_collider: Query<Entity, With<PlayerCollider>>,
+    mut query_player_root: Query<&mut Transform, With<PlayerRoot>>,
+    mut contact_events: EventReader<CollisionEvent>,
+) {
+    for contact_event in contact_events.iter() {
+        for player_entity in query_player_collider.iter() {
+            if let CollisionEvent::Started(h1, h2, _event_flag) = contact_event {
+                if h1 == &player_entity || h2 == &player_entity {
+                    for mut player_root_transform in query_player_root.iter_mut() {
+                        player_root_transform.translation.z = 0.0; // actually do something later
+                    }
+                }
             }
         }
     }
