@@ -7,6 +7,7 @@ mod constants;
 mod environment;
 mod lanes;
 mod obstacles;
+mod particles;
 mod player;
 
 use crate::environment::level::LevelPlugin;
@@ -14,6 +15,7 @@ use bevy::prelude::*;
 use bevy_editor_pls::prelude::*;
 use bevy_rapier3d::prelude::*;
 use obstacles::ObstaclePlugin;
+use particles::ParticlePlugin;
 use player::PlayerPlugin;
 
 fn main() {
@@ -28,5 +30,6 @@ fn main() {
         .add_plugin(PlayerPlugin)
         .add_plugin(RapierDebugRenderPlugin::default()) // disable hdr to use
         .add_plugin(ObstaclePlugin)
+        .add_plugin(ParticlePlugin)
         .run();
 }

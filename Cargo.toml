@@ -15,15 +15,14 @@ lto = true
 codegen-units = 1
 
 [features]
-dev = [
-    "bevy/dynamic_linking",
-]
+dev = ["bevy/dynamic_linking"]
 
 [dependencies]
 rand = "0.8.5"
 bevy = { version = "0.10", default-features = true}
 bevy_rapier3d = { version = "0.21", features = [ "simd-stable", "debug-render-3d" ] }
 bevy_editor_pls = "0.3"
+bevy_hanabi = "0.6.1"
 
 [build-dependencies]
 embed-resource = "1.4"
