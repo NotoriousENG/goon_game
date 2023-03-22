@@ -10,7 +10,7 @@ mod obstacles;
 mod player;
 
 use crate::environment::level::LevelPlugin;
-use bevy::prelude::*;
+use bevy::{diagnostic::FrameTimeDiagnosticsPlugin, prelude::*};
 use bevy_editor_pls::prelude::*;
 use bevy_rapier3d::prelude::*;
 use obstacles::ObstaclePlugin;
@@ -24,6 +24,7 @@ fn main() {
         }))
         .add_plugin(RapierPhysicsPlugin::<NoUserData>::default())
         .add_plugin(EditorPlugin)
+        .add_plugin(FrameTimeDiagnosticsPlugin)
         .add_plugin(LevelPlugin)
         .add_plugin(PlayerPlugin)
         .add_plugin(RapierDebugRenderPlugin::default()) // disable hdr to use
