@@ -17,9 +17,25 @@ codegen-units = 1
 [features]
 dev = ["bevy/dynamic_linking"]
 
+[patch.crates-io]
+bevy = { git = "https://github.com/NotoriousENG/bevy.git", branch = "eng-0.10.0" }
+bevy_app = { git = "https://github.com/NotoriousENG/bevy.git", branch = "eng-0.10.0" }
+bevy_asset = { git = "https://github.com/NotoriousENG/bevy.git", branch = "eng-0.10.0" }
+bevy_core = { git = "https://github.com/NotoriousENG/bevy.git", branch = "eng-0.10.0" }
+bevy_ecs = { git = "https://github.com/NotoriousENG/bevy.git", branch = "eng-0.10.0" }
+bevy_hierarchy = { git = "https://github.com/NotoriousENG/bevy.git", branch = "eng-0.10.0" }
+bevy_log = { git = "https://github.com/NotoriousENG/bevy.git", branch = "eng-0.10.0" }
+bevy_math = { git = "https://github.com/NotoriousENG/bevy.git", branch = "eng-0.10.0" }
+bevy_reflect = { git = "https://github.com/NotoriousENG/bevy.git", branch = "eng-0.10.0" }
+bevy_utils = { git = "https://github.com/NotoriousENG/bevy.git", branch = "eng-0.10.0" }
+bevy_window = { git = "https://github.com/NotoriousENG/bevy.git", branch = "eng-0.10.0" }
+bevy_core_pipeline = { git = "https://github.com/NotoriousENG/bevy.git", branch = "eng-0.10.0" }
+bevy_pbr = { git = "https://github.com/NotoriousENG/bevy.git", branch = "eng-0.10.0" }
+bevy_render = { git = "https://github.com/NotoriousENG/bevy.git", branch = "eng-0.10.0" }
+
 [dependencies]
 rand = "0.8.5"
-bevy = { version = "0.10", default-features = true, features = [ "jpeg" ]}
+bevy = { git = "https://github.com/NotoriousENG/bevy.git", branch = "eng-0.10.0", version = "0.10", default-features = true, features = [ "jpeg" ]}
 bevy_rapier3d = { version = "0.21", features = [ "simd-stable", "debug-render-3d" ] }
 bevy_editor_pls = "0.3"
 

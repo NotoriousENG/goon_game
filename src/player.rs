@@ -1,7 +1,7 @@
 use std::time::Duration;
 
 use crate::{
-    constants::{LANE_FACTOR, TRACK_LENGTH},
+    constants::{LANE_FACTOR, TRACK_LENGTH, FAR_PLANE},
     lanes::LaneEntity,
 };
 use bevy::prelude::*;
@@ -72,6 +72,12 @@ fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
             root.spawn(Camera3dBundle {
                 transform: Transform::from_xyz(0.0, CAMERA_HEIGHT, CAM_Z_DISTANCE)
                     .looking_at(Vec3::Y * CAMERA_HEIGHT / 1.5, Vec3::Y),
+                projection: PerspectiveProjection {
+                    far: FAR_PLANE,
+                    use_far_culling: true,
+                    ..default()
+                }
+                .into(),
                 ..default()
             });
         });
